@@ -45,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenWishlist, onOp
 
   return (
     <nav className="sticky top-0 z-40 w-full border-b border-slate-800 bg-darkBg/90 backdrop-blur-md transition-all duration-300 font-delight">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-full px-6 lg:px-12">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => handleNavClick('Home')}>
@@ -170,7 +170,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenWishlist, onOp
             ) : (
               <button
                 onClick={onOpenAuth}
-                className="rounded-full bg-brandRed px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-brandRed/20 transition-all hover:bg-red-700 hover:shadow-brandRed/45 active:scale-95"
+                className="rounded-full bg-brandRed px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-brandRed/25 transition-all hover:bg-red-650 hover:shadow-brandRed/50 hover:scale-105 active:scale-95 whitespace-nowrap"
               >
                 Join / Sign In
               </button>
