@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState } from 'react'
 import { useStarMc } from '@/context/StarMcContext'
 import { Navbar } from '@/components/Navbar'
@@ -23,7 +21,7 @@ import { Contact } from '@/components/pages/Contact'
 import { Dashboard } from '@/components/pages/Dashboard'
 import { AdminDashboard } from '@/components/pages/AdminDashboard'
 
-export default function page() {
+export default function App() {
   const { activeTab } = useStarMc()
   const [cartOpen, setCartOpen] = useState(false)
   const [wishlistOpen, setWishlistOpen] = useState(false)
