@@ -18,10 +18,11 @@ const config: Config = {
         brandSteel: '#475569',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'sans-serif'],
-        bebas: ['var(--font-bebas-neue)', 'sans-serif'],
-        oswald: ['var(--font-oswald)', 'sans-serif'],
-        poppins: ['var(--font-poppins)', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
+        bebas: ['Delight', '"Raveo Variable Variable"', 'sans-serif'],
+        oswald: ['Delight', '"Raveo Variable Variable"', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
+        delight: ['Delight', '"Raveo Variable Variable"', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

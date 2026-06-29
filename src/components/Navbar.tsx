@@ -44,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenWishlist, onOp
   }
 
   return (
-    <nav className="sticky top-0 z-40 w-full border-b border-slate-800 bg-darkBg/90 backdrop-blur-md transition-all duration-300">
+    <nav className="sticky top-0 z-40 w-full border-b border-slate-800 bg-darkBg/90 backdrop-blur-md transition-all duration-300 font-delight">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
