@@ -47,6 +47,9 @@ const leaderboardRouter = require('./routes/leaderboard')
 const userRouter = require('./routes/user')
 
 // Register routes
+app.get('/', (req, res) => {
+  res.json({ success: true, message: 'STARMC API is running smoothly' })
+})
 app.use('/api/seed', seedRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/rides', ridesRouter)
