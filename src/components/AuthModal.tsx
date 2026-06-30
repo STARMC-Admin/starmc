@@ -18,6 +18,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [chapter, setChapter] = useState('Karnataka')
   
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   
   const [loginMethod, setLoginMethod] = useState<'email' | 'otp' | 'google'>('email')
   const [phone, setPhone] = useState('')
@@ -26,36 +27,51 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
+    let success = false
     if (loginMethod === 'email') {
-      login(email || 'ishaan@starmc.in', password || 'user123')
+      success = await login(email || 'ishaan@starmc.in', password || 'user123')
     } else if (loginMethod === 'otp') {
       if (!otpSent) {
         setOtpSent(true)
+        setIsLoading(false)
         alert('Simulated SMS OTP sent to ' + phone + '. Use verification code: 123456')
         return
       } else {
         if (otpCode !== '123456') {
           alert('Invalid simulated OTP! Please enter "123456".')
+          setIsLoading(false)
           return
         }
-        login('phone-user@starmc.in', 'user123')
+        success = await login('phone-user@starmc.in', 'user123')
       }
     }
-    onClose()
+    setIsLoading(false)
+    if (success) {
+      onClose()
+    }
   }
 
-  const handleGoogleLogin = () => {
-    login('google-rider@gmail.com', 'user123')
-    onClose()
+  const handleGoogleLogin = async () => {
+    setIsLoading(true)
+    const success = await login('google-rider@gmail.com', 'user123')
+    setIsLoading(false)
+    if (success) {
+      onClose()
+    }
   }
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    registerUser(name, email, motorcycle, chapter)
-    alert(`Welcome to the brotherhood, ${name}! Your starter referral bonus points are loaded.`)
-    onClose()
+    setIsLoading(true)
+    const success = await registerUser(name, email, password, motorcycle, chapter)
+    setIsLoading(false)
+    if (success) {
+      alert(`Welcome to the brotherhood, ${name}! Your starter referral bonus points are loaded.`)
+      onClose()
+    }
   }
 
   return (
@@ -132,6 +148,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               />
             </div>
             <div>
+              <label className="block text-xs font-bold uppercase text-slate-400 mb-1.5">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+                <input 
+                  type="password" 
+                  required
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full rounded border border-slate-800 bg-slate-950 pl-10 pr-3.5 py-2 text-sm text-slate-200 focus:border-brandRed focus:outline-none"
+                />
+              </div>
+            </div>
+            <div>
               <label className="block text-xs font-bold uppercase text-slate-400 mb-1.5">Motorcycle Brand & Model</label>
               <input 
                 type="text" 
@@ -159,9 +189,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             </div>
             <button 
               type="submit"
-              className="w-full rounded bg-brandRed py-2.5 text-sm font-bold uppercase tracking-wider text-white hover:bg-red-700 transition-colors mt-2"
+              disabled={isLoading}
+              className="w-full rounded bg-brandRed py-2.5 text-sm font-bold uppercase tracking-wider text-white hover:bg-red-700 disabled:bg-red-900 transition-colors mt-2"
             >
-              Sign Up & Get 200 Pts
+              {isLoading ? 'Signing Up...' : 'Sign Up & Get 200 Pts'}
             </button>
           </form>
         ) : (
@@ -227,9 +258,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 </div>
                 <button 
                   type="submit"
-                  className="w-full rounded bg-brandRed py-2.5 text-sm font-bold uppercase tracking-wider text-white hover:bg-red-700 transition-colors mt-2"
+                  disabled={isLoading}
+                  className="w-full rounded bg-brandRed py-2.5 text-sm font-bold uppercase tracking-wider text-white hover:bg-red-700 disabled:bg-red-900 transition-colors mt-2"
                 >
-                  Log In
+                  {isLoading ? 'Logging In...' : 'Log In'}
                 </button>
               </form>
             )}
@@ -267,9 +299,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 )}
                 <button 
                   type="submit"
-                  className="w-full rounded bg-brandRed py-2.5 text-sm font-bold uppercase tracking-wider text-white hover:bg-red-700 transition-colors mt-2"
+                  disabled={isLoading}
+                  className="w-full rounded bg-brandRed py-2.5 text-sm font-bold uppercase tracking-wider text-white hover:bg-red-700 disabled:bg-red-900 transition-colors mt-2"
                 >
-                  {otpSent ? 'Verify OTP & Log In' : 'Request OTP Code'}
+                  {isLoading ? 'Processing...' : (otpSent ? 'Verify OTP & Log In' : 'Request OTP Code')}
                 </button>
               </form>
             )}
@@ -278,10 +311,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <div className="space-y-4 pt-2">
                 <button 
                   onClick={handleGoogleLogin}
-                  className="flex w-full items-center justify-center space-x-3 rounded border border-slate-800 bg-slate-950 py-2.5 hover:bg-slate-800/50 transition-colors"
+                  disabled={isLoading}
+                  className="flex w-full items-center justify-center space-x-3 rounded border border-slate-800 bg-slate-950 py-2.5 hover:bg-slate-800/50 disabled:opacity-50 transition-colors"
                 >
                   <Globe className="h-5 w-5 text-slate-400" />
-                  <span className="text-sm font-bold text-slate-200">Log In with Google</span>
+                  <span className="text-sm font-bold text-slate-200">
+                    {isLoading ? 'Logging In...' : 'Log In with Google'}
+                  </span>
                 </button>
                 <p className="text-[10px] text-slate-500 text-center">
                   Google OAuth will mock authenticate using a developer profile payload.

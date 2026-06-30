@@ -97,7 +97,7 @@ interface StarMcContextType {
   setActiveTab: (tab: string) => void
   login: (email: string, method: string) => Promise<boolean>
   logout: () => void
-  registerUser: (name: string, email: string, motorcycle: string, chapter: string) => void
+  registerUser: (name: string, email: string, password: string, motorcycle: string, chapter: string) => Promise<boolean>
   buyMembership: (type: 'Standard' | 'Premium') => void
   registerForRide: (rideId: number) => Promise<boolean>
   addRideVerification: (rideTitle: string, distance: number, proofUrl: string) => void
@@ -457,21 +457,24 @@ export const StarMcProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     syncCart([])
   }
 
-  const registerUser = async (name: string, email: string, motorcycle: string, chapter: string) => {
+  const registerUser = async (name: string, email: string, password: string, motorcycle: string, chapter: string): Promise<boolean> => {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password: 'user123', motorcycle, chapter }),
+        body: JSON.stringify({ name, email, password, motorcycle, chapter }),
       })
       const data = await res.json()
       if (data.success) {
         setUser(data.user)
+        return true
       } else {
         alert(data.error || 'Registration failed')
+        return false
       }
     } catch (e: any) {
       alert(e.message || 'An error occurred during registration')
+      return false
     }
   }
 
