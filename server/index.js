@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const path = require('path')
+const rateLimit = require('express-rate-limit')
 
 // Load environment variables from parent folder .env
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
@@ -18,8 +19,18 @@ if (!DB_URI) {
 const app = express()
 
 // Middleware
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? ['https://starmc-ctwk.onrender.com']
+  : ['http://localhost:3000', 'http://localhost:3001']
+
 app.use(cors({
-  origin: true,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true
 }))
 app.use(express.json())
@@ -46,12 +57,20 @@ const chaptersRouter = require('./routes/chapters')
 const leaderboardRouter = require('./routes/leaderboard')
 const userRouter = require('./routes/user')
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15, // Limit each IP to 15 requests per window
+  message: { error: 'Too many authentication attempts, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
 // Register routes
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'STARMC API is running smoothly' })
 })
 app.use('/api/seed', seedRouter)
-app.use('/api/auth', authRouter)
+app.use('/api/auth', authLimiter, authRouter)
 app.use('/api/rides', ridesRouter)
 app.use('/api/verify', verifyRouter)
 app.use('/api/merchandise', merchandiseRouter)
@@ -62,7 +81,9 @@ app.use('/api/user', userRouter)
 // Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack)
-  res.status(500).json({ success: false, error: err.message || 'Internal Server Error' })
+  const isProduction = process.env.NODE_ENV === 'production'
+  const message = isProduction ? 'Internal Server Error' : (err.message || 'Internal Server Error')
+  res.status(500).json({ success: false, error: message })
 })
 
 app.listen(PORT, () => {

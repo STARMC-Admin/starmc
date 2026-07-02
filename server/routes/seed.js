@@ -223,6 +223,16 @@ const DEFAULT_CHAPTERS = [
 
 router.get('/', async (req, res, next) => {
   try {
+    // Protect from unauthorized database seeding in production
+    if (process.env.NODE_ENV === 'production') {
+      const seedAdminKey = process.env.SEED_ADMIN_KEY;
+      const clientKey = req.headers['x-seed-key'];
+      
+      if (!seedAdminKey || clientKey !== seedAdminKey) {
+        return res.status(403).json({ error: 'Database seeding operations are restricted in production.' });
+      }
+    }
+
     // 1. Clear database
     await Ride.deleteMany({})
     await Product.deleteMany({})
